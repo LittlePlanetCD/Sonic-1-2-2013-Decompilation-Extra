@@ -1166,7 +1166,7 @@ bool RetroEngine::LoadGameConfig(const char *filePath)
         SetGlobalVariableByName("engine.standalone", true);
 #endif
 #if !RETRO_USE_ORIGINAL_CODE
-		SetGlobalVariableByName("isRemovedAds", true); // we're disabling ads for setups with no scripts (bytecode) to make it more in-line with script-enabled setups.
+	SetGlobalVariableByName("isRemovedAds", true); // we're disabling ads for setups with no scripts (bytecode) to make it more in-line with script-enabled setups.
 #endif
     }
 
