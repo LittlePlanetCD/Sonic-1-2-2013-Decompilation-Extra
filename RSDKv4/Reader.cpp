@@ -152,6 +152,7 @@ bool LoadFile(const char *filePath, FileInfo *fileInfo)
     for (int c = 0; c < strlen(filePathBuf); ++c) {
         pathLower[c] = tolower(filePathBuf[c]);
     }
+
     bool addPath = true;
     int m = activeMod != -1 ? activeMod : 0; 
     for (; m < modList.size(); ++m) {
