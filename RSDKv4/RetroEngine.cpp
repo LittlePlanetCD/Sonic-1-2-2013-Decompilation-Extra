@@ -647,6 +647,41 @@ int GetXMLAttributeValueInt(const tinyxml2::XMLAttribute *attributePtr) { return
 bool GetXMLAttributeValueBool(const tinyxml2::XMLAttribute *attributePtr) { return attributePtr->BoolValue(); }
 const char *GetXMLAttributeValueString(const tinyxml2::XMLAttribute *attributePtr) { return attributePtr->Value(); }
 
+void RetroEngine::LoadXMLWindowText()
+{
+    FileInfo info;
+    for (int m = 0; m < (int)modList.size(); ++m) {
+        if (!modList[m].active)
+            continue;
+
+        SetActiveMod(m);
+        if (LoadFile("Data/Game/Game.xml", &info)) {
+            tinyxml2::XMLDocument *doc = new tinyxml2::XMLDocument;
+
+            char *xmlData = new char[info.fileSize + 1];
+            FileRead(xmlData, info.fileSize);
+            xmlData[info.fileSize] = 0;
+
+            bool success = doc->Parse(xmlData) == tinyxml2::XML_SUCCESS;
+
+            if (success) {
+                const tinyxml2::XMLElement *gameElement  = FirstXMLChildElement(doc, nullptr, "game");
+                const tinyxml2::XMLElement *titleElement = FirstXMLChildElement(doc, gameElement, "title");
+                if (titleElement) {
+                    const tinyxml2::XMLAttribute *nameAttr = FindXMLAttribute(titleElement, "name");
+                    if (nameAttr)
+                        StrCopy(gameWindowText, GetXMLAttributeValueString(nameAttr));
+                }
+            }
+
+            delete[] xmlData;
+            delete doc;
+
+            CloseFile();
+        }
+    }
+    SetActiveMod(-1);
+}
 void RetroEngine::LoadXMLVariables()
 {
     FileInfo info;
@@ -1127,6 +1162,10 @@ bool RetroEngine::LoadGameConfig(const char *filePath)
             globalVariables[v] += fileBuffer2 << 24;
         }
 
+#if RETRO_REV03
+        SetGlobalVariableByName("game.hasPlusDLC", 0); // Just force to false for now. TODO: Add a proper check
+#endif
+
         // Read SFX
         byte globalSFXCount = 0;
         FileRead(&globalSFXCount, 1);
@@ -1190,17 +1229,17 @@ bool RetroEngine::LoadGameConfig(const char *filePath)
         }
 
         CloseFile();
+
 #if RETRO_USE_MOD_LOADER
+        LoadXMLWindowText();
         LoadXMLVariables();
         LoadXMLPalettes();
         LoadXMLObjects();
         LoadXMLPlayers(NULL);
         LoadXMLStages(NULL, 0);
 
-        SetGlobalVariableByName("options.devMenuFlag", false);
-        if (Engine.devMenu)
-            SetGlobalVariableByName("options.devMenuFlag", true);
-        SetGlobalVariableByName("engine.standalone", true);
+        SetGlobalVariableByName("options.devMenuFlag", devMenu ? 1 : 0);
+        SetGlobalVariableByName("engine.standalone", 1);
 #endif
 #if !RETRO_USE_ORIGINAL_CODE
 	SetGlobalVariableByName("isRemovedAds", true); // we're disabling ads for setups with no scripts (bytecode) to make it more in-line with script-enabled setups.
