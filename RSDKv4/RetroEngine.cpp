@@ -1162,10 +1162,6 @@ bool RetroEngine::LoadGameConfig(const char *filePath)
             globalVariables[v] += fileBuffer2 << 24;
         }
 
-#if RETRO_REV03
-        SetGlobalVariableByName("game.hasPlusDLC", 0); // Just force to false for now. TODO: Add a proper check
-#endif
-
         // Read SFX
         byte globalSFXCount = 0;
         FileRead(&globalSFXCount, 1);
@@ -1245,6 +1241,10 @@ bool RetroEngine::LoadGameConfig(const char *filePath)
 	SetGlobalVariableByName("isRemovedAds", true); // we're disabling ads for setups with no scripts (bytecode) to make it more in-line with script-enabled setups.
 #endif
     }
+
+#if RETRO_REV03
+    SetGlobalVariableByName("game.hasPlusDLC", !RSDK_AUTOBUILD);
+#endif
 
     // These need to be set every time its reloaded
     nativeFunctionCount = 0;
