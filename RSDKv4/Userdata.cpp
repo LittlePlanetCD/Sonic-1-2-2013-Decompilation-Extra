@@ -731,7 +731,7 @@ void WriteSettings()
 
 #if RETRO_USING_SDL2
     ini.SetComment("Keyboard 1", "IK1Comment",
-                   "Keyboard Mappings for P1 (Based on: https://wiki.libsdl.org/SDL2/SDLScancodeLookup)");
+                   "Keyboard Mappings for P1 (Based on: https://wiki.libsdl.org/SDL2/SDL_Scancode)");
 #endif
 #if RETRO_USING_SDL1
     ini.SetComment("Keyboard 1", "IK1Comment", "Keyboard Mappings for P1 (Based on: https://www.libsdl.org/release/SDL-1.2.15/docs/html/sdlkey.html)");
